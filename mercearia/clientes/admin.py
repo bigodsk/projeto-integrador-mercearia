@@ -13,7 +13,6 @@ class ClienteAdmin(admin.ModelAdmin):
     readonly_fields = ("divida_total",)
     inlines = [FiadoInline]
 
-
 @admin.register(Produto)
 class ProdutoAdmin(admin.ModelAdmin):
     list_display = ("nome", "preco")
