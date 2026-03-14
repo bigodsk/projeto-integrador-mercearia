@@ -13,6 +13,10 @@ class ClienteAdmin(admin.ModelAdmin):
     readonly_fields = ("divida_total",)
     inlines = [FiadoInline]
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs
+
 @admin.register(Produto)
 class ProdutoAdmin(admin.ModelAdmin):
     list_display = ("nome", "preco")

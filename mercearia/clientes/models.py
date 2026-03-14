@@ -10,7 +10,7 @@ class Cliente(models.Model):
     
     def divida_total(self):
         total = 0
-        fiados = self.fiado_set.all()
+        fiados = self.fiado_set.filter(pago=False)
 
         for f in fiados:
             total += f.quantidade * f.produto.preco
