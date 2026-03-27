@@ -1,28 +1,31 @@
 from django.contrib import admin
+from django import forms
+from django.core.exceptions import ValidationError
 from .models import Cliente, Produto, Fiado
 
+class FiadoForm(forms.ModelForm):
+    class Meta:
+        model = Fiado
+        fields = '__all__'
 
-class FiadoInline(admin.TabularInline):
-    model = Fiado
-    extra = 0
+    def clean(self):
+        cleaned_data = super().clean()
+        produto = cleaned_data.get('produto')
+        quantidade = cleaned_data.get('quantidade')
 
-
-@admin.register(Cliente)
-class ClienteAdmin(admin.ModelAdmin):
-    list_display = ("nome", "telefone", "divida_total")
-    readonly_fields = ("divida_total",)
-    inlines = [FiadoInline]
-
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs
-
-@admin.register(Produto)
-class ProdutoAdmin(admin.ModelAdmin):
-    list_display = ("nome", "preco")
-
+        # Validação amigável para a interface
+        if produto and quantidade and not self.instance.pk:
+            if produto.estoque < quantidade:
+                raise forms.ValidationError(
+                    f"Atenção: Estoque insuficiente! O produto {produto.nome} só tem {produto.estoque} unidades."
+                )
+        return cleaned_data
 
 @admin.register(Fiado)
 class FiadoAdmin(admin.ModelAdmin):
-    list_display = ("cliente", "produto", "quantidade", "data", "total")
-    list_filter = ("data", "cliente")
+    form = FiadoForm
+    list_display = ('cliente', 'produto', 'quantidade', 'data', 'pago')
+
+# Registre os outros se ainda não estiverem lá
+admin.site.register(Cliente)
+admin.site.register(Produto)
