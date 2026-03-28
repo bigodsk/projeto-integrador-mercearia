@@ -11,27 +11,23 @@ admin.site.site_title = "Gestão Neusa"
 # 2. Configuração da lista de Produtos com Alerta Visual
 @admin.register(Produto)
 class ProdutoAdmin(admin.ModelAdmin):
-    # 'status_estoque' chama a função que criamos abaixo
     list_display = ('nome', 'preco', 'status_estoque') 
-    list_editable = ('preco',) # O preço pode editar na lista, o estoque colorido não
+    list_editable = ('preco',) 
 
     def status_estoque(self, obj):
         if obj.estoque <= 3:
-            # Fundo Vermelho para estoque baixo
             return format_html(
                 '<span style="background-color: #e74c3c; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">{} - REPOR!</span>',
                 obj.estoque
             )
-        # Fundo Verde para estoque ok
         return format_html(
             '<span style="background-color: #27ae60; color: white; padding: 5px 10px; border-radius: 5px;">{}</span>',
             obj.estoque
         )
     
-    # Esta linha deve estar alinhada com o 'def' acima
     status_estoque.short_description = 'Estoque Atual'
 
-# 3. Configuração do Fiado com Trava de Segurança
+# 3. Configuração do Fiado com Trava de Segurança e Cores
 class FiadoForm(forms.ModelForm):
     class Meta:
         model = Fiado
@@ -52,8 +48,21 @@ class FiadoForm(forms.ModelForm):
 @admin.register(Fiado)
 class FiadoAdmin(admin.ModelAdmin):
     form = FiadoForm
-    list_display = ('cliente', 'produto', 'quantidade', 'data', 'pago')
+    # Adicionamos 'status_pagamento' e mantivemos o 'pago' para evitar o erro de edição
+    list_display = ('cliente', 'produto', 'quantidade', 'data', 'status_pagamento', 'pago')
     list_filter = ('pago', 'data')
+    list_editable = ('pago',) # Permite dar baixa no fiado direto na lista
+
+    def status_pagamento(self, obj):
+        if obj.pago:
+            return format_html(
+                '<span style="background-color: #2980b9; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">CONCLUÍDO</span>'
+            )
+        return format_html(
+            '<span style="background-color: #c0392b; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">PENDENTE</span>'
+        )
+    
+    status_pagamento.short_description = 'Situação'
 
 # 4. Registro do Cliente
 admin.site.register(Cliente)
