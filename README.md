@@ -20,14 +20,14 @@ python manage.py createsuperuser
 
 ## Estrutura
 
-- `clientes/models.py` — Cliente, Produto, Fiado
+- `clientes/models.py` — Cliente, Produto, Fiado, Venda
 - `clientes/views.py` — todo o CRUD
 - `clientes/forms.py` — validação dos formulários
 - `clientes/admin.py` — painel admin customizado
 
 ## Observações
 
-- Ao registrar um fiado o estoque é descontado automaticamente
+- Ao registrar um fiado ou venda o estoque é descontado automaticamente
 - Se não tiver estoque suficiente o sistema bloqueia o cadastro
 - Produtos com 3 ou menos unidades aparecem com alerta vermelho
 - O saldo de cada cliente é calculado somando os fiados em aberto
