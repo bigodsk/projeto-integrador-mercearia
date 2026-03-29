@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Cliente, Produto, Fiado
+from .models import Cliente, Produto, Fiado, Venda
 from .forms import FiadoForm
 
 admin.site.site_header = "MERCEARIA DA NEUSA"
@@ -63,3 +63,17 @@ class FiadoAdmin(admin.ModelAdmin):
         )
 
     status_pagamento.short_description = 'Situação'
+
+
+@admin.register(Venda)
+class VendaAdmin(admin.ModelAdmin):
+    list_display = ('produto', 'cliente', 'quantidade', 'valor_unitario', 'total_venda', 'data')
+    list_filter = ('data', 'produto')
+    search_fields = ('produto__nome', 'cliente__nome')
+    ordering = ('-data',)
+    readonly_fields = ('valor_unitario', 'data')
+
+    def total_venda(self, obj):
+        return format_html('<strong>R$ {}</strong>', obj.total())
+
+    total_venda.short_description = 'Total'
