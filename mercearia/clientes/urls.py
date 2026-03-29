@@ -20,4 +20,8 @@ urlpatterns = [
     path('fiados/<int:pk>/editar/', views.editar_fiado, name='editar_fiado'),
     path('fiados/<int:pk>/deletar/', views.deletar_fiado, name='deletar_fiado'),
     path('fiados/<int:pk>/pagar/', views.pagar_fiado, name='pagar_fiado'),
+
+    path('vendas/', views.lista_vendas, name='lista_vendas'),
+    path('vendas/nova/', views.criar_venda, name='criar_venda'),
+    path('vendas/<int:pk>/deletar/', views.deletar_venda, name='deletar_venda'),
 ]
