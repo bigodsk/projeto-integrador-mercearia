@@ -66,3 +66,35 @@ class Fiado(models.Model):
 
     def __str__(self):
         return f"{self.cliente} - {self.produto}"
+
+
+class Venda(models.Model):
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True)
+    quantidade = models.IntegerField()
+    valor_unitario = models.DecimalField(max_digits=8, decimal_places=2)
+    data = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = 'Vendas'
+        ordering = ['-data']
+
+    def total(self):
+        return self.quantidade * self.valor_unitario
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            if self.produto.estoque < self.quantidade:
+                raise ValidationError(
+                    f"Estoque insuficiente! '{self.produto.nome}' "
+                    f"tem apenas {self.produto.estoque} unidade(s)."
+                )
+            with transaction.atomic():
+                self.produto.estoque -= self.quantidade
+                self.produto.save()
+                super().save(*args, **kwargs)
+        else:
+            super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Venda {self.pk} - {self.produto.nome}"
